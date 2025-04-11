@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolling Riches: Silk Road Trading Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f8f3e6;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZjhmM2U2Ij48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlNmRiYzgiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=');
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', serif;
+        }
+        
+        /* Monopoly Board Styling */
+        .game-board-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            aspect-ratio: 1 / 1;
+        }
+        
+        .game-board {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            grid-template-rows: repeat(11, 1fr);
+            border: 8px solid #8B4513;
+            background-color: #C4E1FF;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        /* Board Tiles */
+        .board-tile {
+            border: 1px solid #8B4513;
+            background-color: #E5F2FF;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+        
+        .board-tile:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        /* Corner Tiles */
+        .corner-tile {
+            grid-column: span 2;
+            grid-row: span 2;
+            background-color: #E8E8E8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        /* Commodity Groups */
+        .group-silk {
+            background-color: #FFC0CB;
+            border-top: 6px solid #FF69B4;
+        }
+        
+        .group-spice {
+            background-color: #FFB347;
+            border-top: 6px solid #FF8C00;
+        }
+        
+        .group-jewelry {
+            background-color: #FFD700;
+            border-top: 6px solid #FFA500;
+        }
+        
+        .group-slaves {
+            background-color: #90EE90;
+            border-top: 6px solid #32CD32;
+        }
+        
+        /* Special Tiles */
+        .testimonial {
+            background-color: #B0E0E6;
+        }
+        
+        .factfile {
+            background-color: #E6E6FA;
+        }
+        
+        .fate-card {
+            background-color: #FFB6C1;
+        }
+        
+        .start {
+            background-color: #F0F0F0;
+        }
+        
+        .checkpoint {
+            background-color: #FF9999;
+        }
+        
+        .detention {
+            background-color: #FFA07A;
+        }
+        
+        .merchant-quarters {
+            background-color: #AFEEEE;
+        }
+        
+        /* Text Orientation */
+        .bottom-row .tile-name {
+            transform: rotate(0deg);
+            margin-bottom: 2px;
+        }
+        
+        .left-column .tile-name {
+            transform: rotate(90deg);
+            transform-origin: center;
+            margin-top: 20px;
+            white-space: nowrap;
+        }
+        
+        .top-row .tile-name {
+            transform: rotate(180deg);
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+        
+        .right-column .tile-name {
+            transform: rotate(270deg);
+            transform-origin: center;
+            margin-top: 20px;
+            white-space: nowrap;
+        }
+        
+        /* Center Logo */
+        .board-center {
+            grid-column: 3 / span 7;
+            grid-row: 3 / span 7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            font-size: 3rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            background-color: #8B0000;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            transform: rotate(-45deg);
+            border: 3px solid #6B0000;
+        }
+        
+        /* Diagonal Elements */
+        .diagonal-element {
+            position: absolute;
+            padding: 20px;
+            transform: rotate(-45deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        .info-element {
+            background-color: #4FB8E8;
+            top: 30%;
+            left: 30%;
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+        
+        .question-element {
+            background-color: #FFA500;
+            bottom: 30%;
+            right: 30%;
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+        
+        /* Player Tokens */
+        .player-token {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 20;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        /* Dice */
+        .dice {
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        /* Card Icons */
+        .card-icon {
+            font-size: 1rem;
+            margin: 2px 0;
+        }
+        
+        /* Corner Icons */
+        .start-arrow {
+            font-size: 2rem;
+            color: #FF0000;
+        }
+        
+        .jail-icon {
+            font-size: 1.5rem;
+            color: #000000;
+        }
+        
+        /* Price Tag */
+        .price-tag {
+            font-size: 0.6rem;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        
+        /* Modal */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .game-board-container {
+                max-width: 95vw;
+            }
+            
+            .tile-name, .price-tag {
+                font-size: 0.5rem;
+            }
+            
+            .board-center {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Entry Screen -->
+    <div id="entry-screen" class="flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="bg-amber-50 shadow-lg rounded-lg max-w-md w-full p-6 border-2 border-amber-800">
+            <h1 class="text-3xl text-amber-900 text-center mb-6">Rolling Riches</h1>
+            <h2 class="text-xl text-amber-800 text-center mb-8">A Silk Road Trading Adventure</h2>
+            
+            <form id="player-form" class="space-y-4">
+                <div id="players-container">
+                    <div class="player-input flex flex-col space-y-2 p-3 border border-amber-200 rounded-md mb-3">
+                        <label class="text-amber-800">Player 1 Name:</label>
+                        <input type="text" name="player-name" value="Merchant 1" required class="border border-amber-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <div class="flex items-center space-x-2 mt-2">
+                            <label class="text-amber-800 flex-1">Token Color:</label>
+                            <div class="flex space-x-2">
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-red-500" data-color="#EF4444"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-blue-500" data-color="#3B82F6"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-green-500" data-color="#10B981"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-yellow-500" data-color="#F59E0B"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-purple-500" data-color="#8B5CF6"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-pink-500" data-color="#EC4899"></div>
+                                <input type="hidden" name="player-color" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="player-input flex flex-col space-y-2 p-3 border border-amber-200 rounded-md mb-3">
+                        <label class="text-amber-800">Player 2 Name:</label>
+                        <input type="text" name="player-name" value="Merchant 2" required class="border border-amber-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <div class="flex items-center space-x-2 mt-2">
+                            <label class="text-amber-800 flex-1">Token Color:</label>
+                            <div class="flex space-x-2">
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-red-500" data-color="#EF4444"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-blue-500" data-color="#3B82F6"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-green-500" data-color="#10B981"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-yellow-500" data-color="#F59E0B"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-purple-500" data-color="#8B5CF6"></div>
+                                <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-pink-500" data-color="#EC4899"></div>
+                                <input type="hidden" name="player-color" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" id="add-player" class="bg-amber-700 text-white rounded px-4 py-2 hover:bg-amber-800 transition-colors">Add Player</button>
+                    <button type="button" id="remove-player" class="bg-red-700 text-white rounded px-4 py-2 hover:bg-red-800 transition-colors">Remove Player</button>
+                </div>
+                <button type="submit" id="start-game" class="w-full bg-amber-600 text-white rounded-lg p-3 mt-6 hover:bg-amber-700 transition-colors">Start Game</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Screen (Hidden Initially) -->
+    <div id="game-screen" class="hidden min-h-screen flex flex-col">
+        <!-- Game Top Bar -->
+        <div class="bg-amber-800 text-white p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl">Rolling Riches</h1>
+                <div class="flex space-x-4">
+                    <button id="game-rules" class="px-3 py-1 bg-amber-700 rounded">Rules</button>
+                    <button id="end-game" class="px-3 py-1 bg-red-700 rounded">End Game</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Game Area -->
+        <div class="flex-1 flex flex-col md:flex-row p-4 gap-4">
+            <!-- Game Board -->
+            <div class="md:w-3/4 bg-amber-50 rounded-lg shadow-lg p-4 flex justify-center items-center overflow-auto">
+                <div class="game-board-container">
+                    <div id="game-board" class="game-board">
+                        <!-- Board content will be generated by JavaScript -->
+                        
+                        <!-- Board center logo -->
+                        <div class="board-center">
+                            Rolling Riches
+                        </div>
+                        
+                        <!-- Diagonal Elements -->
+                        <div class="diagonal-element info-element">
+                            ℹ️
+                        </div>
+                        
+                        <div class="diagonal-element question-element">
+                            ❓
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game Controls -->
+            <div class="md:w-1/4 flex flex-col gap-4">
+                <!-- Current Player Info -->
+                <div class="bg-amber-50 rounded-lg shadow-lg p-4">
+                    <h2 class="text-xl text-amber-900 mb-3">Current Player</h2>
+                    <div id="current-player" class="flex items-center space-x-3 mb-4">
+                        <div id="player-token-display" class="w-6 h-6 rounded-full"></div>
+                        <div id="player-name-display" class="font-bold">Player 1</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div class="font-bold">TIPs:</div>
+                        <div id="player-tips">1500</div>
+                        <div class="font-bold">Position:</div>
+                        <div id="player-position">Chang'an</div>
+                    </div>
+                </div>
+                
+                <!-- Player Inventory -->
+                <div class="bg-amber-50 rounded-lg shadow-lg p-4">
+                    <h2 class="text-xl text-amber-900 mb-3">Inventory</h2>
+                    <div id="player-inventory" class="space-y-2">
+                        <div class="text-sm">Your commodities will appear here</div>
+                    </div>
+                </div>
+                
+                <!-- Game Actions -->
+                <div class="bg-amber-50 rounded-lg shadow-lg p-4">
+                    <h2 class="text-xl text-amber-900 mb-3">Actions</h2>
+                    <div class="flex flex-col space-y-3">
+                        <div class="flex justify-center mb-2">
+                            <div id="dice" class="dice">?</div>
+                        </div>
+                        <button id="roll-dice" class="w-full bg-amber-600 text-white py-2 rounded hover:bg-amber-700 transition-colors">Roll Dice</button>
+                        <button id="buy-commodity" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors hidden">Buy Commodity</button>
+                        <button id="setup-trading-post" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors hidden">Set Up Trading Post</button>
+                        <button id="pay-fine" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors hidden">Pay Fine</button>
+                        <button id="trade" class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition-colors hidden">Trade</button>
+                        <button id="end-turn" class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition-colors">End Turn</button>
+                    </div>
+                </div>
+                
+                <!-- Game Log -->
+                <div class="bg-amber-50 rounded-lg shadow-lg p-4 flex-1 overflow-y-auto">
+                    <h2 class="text-xl text-amber-900 mb-3">Game Log</h2>
+                    <div id="game-log" class="text-sm space-y-1 max-h-40 overflow-y-auto">
+                        <div class="log-entry">Game started. Welcome to Rolling Riches!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Container (Hidden Initially) -->
+    <div id="modal-container" class="modal-container hidden">
+        <div class="modal-content p-6">
+            <h2 id="modal-title" class="text-xl font-bold mb-4">Modal Title</h2>
+            <div id="modal-body" class="mb-6">Modal Content</div>
+            <div class="flex justify-end space-x-4">
+                <button id="modal-cancel" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors">Cancel</button>
+                <button id="modal-confirm" class="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Board Configuration - Based on the layout from the first document
+        const boardConfig = [
+            { name: "CHANG'AN (XI'AN)", type: "start", position: 0, icon: "🏁" },
+            { name: "Chinese Imperial Silk Factories", type: "commodity", group: "silk", price: 120, position: 1 },
+            { name: "CARAVAN FATE CARDS", type: "fate-card", position: 2, icon: "❓" },
+            { name: "Hangzhou Silk Markets", type: "commodity", group: "silk", price: 100, position: 3 },
+            { name: "Testimonials", type: "testimonial", position: 4, icon: "📜" },
+            { name: "Fact Files", type: "factfile", position: 5, icon: "📋" },
+            { name: "Badakhshan Lapis Mines", type: "commodity", group: "jewelry", price: 160, position: 6 },
+            { name: "CARAVAN FATE CARDS", type: "fate-card", position: 7, icon: "❓" },
+            { name: "Samarkand", type: "commodity", group: "jewelry", price: 180, position: 8 },
+            { name: "MONGOL DETENTION CAMPS", type: "detention", position: 9, icon: "🔒" },
+            { name: "Bukhara", type: "commodity", group: "slaves", price: 220, position: 10 },
+            { name: "Khwarazm", type: "commodity", group: "slaves", price: 220, position: 11 },
+            { name: "CARAVAN FATE CARDS", type: "fate-card", position: 12, icon: "❓" },
+            { name: "Merv", type: "commodity", group: "slaves", price: 240, position: 13 },
+            { name: "FACT FILES", type: "factfile", position: 14, icon: "📋" },
+            { name: "Kashgar", type: "commodity", group: "slaves", price: 260, position: 15 },
+            { name: "Testimonials", type: "testimonial", position: 16, icon: "📜" },
+            { name: "Turfan", type: "commodity", group: "silk", price: 280, position: 17 },
+            { name: "MERCHANT QUARTERS", type: "merchant-quarters", position: 18, icon: "🏪" },
+            { name: "Dunhuang", type: "commodity", group: "silk", price: 300, position: 19 },
+            { name: "Siam (Thailand)", type: "commodity", group: "spice", price: 300, position: 20 },
+            { name: "Means of Travel", type: "factfile", position: 21, icon: "📋" },
+            { name: "Malabar Coast", type: "commodity", group: "spice", price: 320, position: 22 },
+            { name: "FACT FILES", type: "factfile", position: 23, icon: "📋" },
+            { name: "Kerala Pepper Plantations", type: "commodity", group: "spice", price: 340, position: 24 },
+            { name: "Ceylon Cinnamon Groves", type: "commodity", group: "spice", price: 360, position: 25 },
+            { name: "CARAVAN FATE CARDS", type: "fate-card", position: 26, icon: "❓" },
+            { name: "MONGOL CHECKPOINTS", type: "checkpoint", position: 27, icon: "⚠️" },
+            { name: "Arabian Cardamom Markets", type: "commodity", group: "spice", price: 380, position: 28 },
+            { name: "Tbilisi Gem Exchange", type: "commodity", group: "jewelry", price: 400, position: 29 },
+            { name: "Goldsmith Guild", type: "commodity", group: "jewelry", price: 420, position: 30 },
+            { name: "Rayy", type: "commodity", group: "jewelry", price: 420, position: 31 },
+            { name: "FACT FILES", type: "factfile", position: 32, icon: "📋" },
+            { name: "Nishapur (Iran)", type: "commodity", group: "jewelry", price: 440, position: 33 },
+            { name: "CARAVAN FATE CARDS", type: "fate-card", position: 34, icon: "❓" },
+            { name: "Constantinople", type: "commodity", group: "jewelry", price: 460, position: 35 }
+        ];
+
+        // Game Configuration
+        const gameConfig = {
+            startingTips: 1500,
+            startingPosition: 0,
+            maxPlayers: 6,
+            minPlayers: 2
+        };
+        
+        // Game State
+        let gameState = {
+            players: [],
+            currentPlayerIndex: 0,
+            board: [],
+            gameStarted: false
+        };
+        
+        // DOM Elements
+        const entryScreen = document.getElementById('entry-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const playerForm = document.getElementById('player-form');
+        const playersContainer = document.getElementById('players-container');
+        const addPlayerBtn = document.getElementById('add-player');
+        const removePlayerBtn = document.getElementById('remove-player');
+        const startGameBtn = document.getElementById('start-game');
+        const gameBoard = document.getElementById('game-board');
+        const diceEl = document.getElementById('dice');
+        const rollDiceBtn = document.getElementById('roll-dice');
+        const buyBtn = document.getElementById('buy-commodity');
+        const setupTradingPostBtn = document.getElementById('setup-trading-post');
+        const payFineBtn = document.getElementById('pay-fine');
+        const tradeBtn = document.getElementById('trade');
+        const endTurnBtn = document.getElementById('end-turn');
+        const gameLog = document.getElementById('game-log');
+        const playerTokenDisplay = document.getElementById('player-token-display');
+        const playerNameDisplay = document.getElementById('player-name-display');
+        const playerTipsDisplay = document.getElementById('player-tips');
+        const playerPositionDisplay = document.getElementById('player-position');
+        const playerInventory = document.getElementById('player-inventory');
+        const modalContainer = document.getElementById('modal-container');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalCancel = document.getElementById('modal-cancel');
+        const modalConfirm = document.getElementById('modal-confirm');
+        
+        // Helper functions
+        function addLogEntry(text) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = text;
+            gameLog.appendChild(entry);
+            gameLog.scrollTop = gameLog.scrollHeight;
+        }
+        
+        function showModal(title, content, confirmText, cancelText, confirmAction, cancelAction) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            
+            if (confirmText) {
+                modalConfirm.textContent = confirmText;
+                modalConfirm.classList.remove('hidden');
+                modalConfirm.onclick = confirmAction || closeModal;
+            } else {
+                modalConfirm.classList.add('hidden');
+            }
+            
+            if (cancelText) {
+                modalCancel.textContent = cancelText;
+                modalCancel.classList.remove('hidden');
+                modalCancel.onclick = cancelAction || closeModal;
+            } else {
+                modalCancel.classList.add('hidden');
+            }
+            
+            modalContainer.classList.remove('hidden');
+        }
+        
+        function closeModal() {
+            modalContainer.classList.add('hidden');
+        }
+        
+        function updatePlayerInfo() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            playerTokenDisplay.style.backgroundColor = currentPlayer.color;
+            playerNameDisplay.textContent = currentPlayer.name;
+            playerTipsDisplay.textContent = currentPlayer.tips;
+            playerPositionDisplay.textContent = boardConfig[currentPlayer.position].name;
+            
+            // Update inventory
+            playerInventory.innerHTML = '';
+            
+            if (currentPlayer.commodities.length === 0) {
+                const emptyInventory = document.createElement('div');
+                emptyInventory.textContent = 'No commodities yet';
+                emptyInventory.className = 'text-sm text-gray-500';
+                playerInventory.appendChild(emptyInventory);
+            } else {
+                // Group commodities by type
+                const groupedCommodities = {};
+                
+                currentPlayer.commodities.forEach(comm => {
+                    if (!groupedCommodities[comm.group]) {
+                        groupedCommodities[comm.group] = [];
+                    }
+                    groupedCommodities[comm.group].push(comm);
+                });
+                
+                // Create inventory list
+                for (const [group, commodities] of Object.entries(groupedCommodities)) {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'mb-2';
+                    
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'font-bold text-sm capitalize';
+                    groupHeader.textContent = group;
+                    groupDiv.appendChild(groupHeader);
+                    
+                    commodities.forEach(comm => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'text-xs ml-2';
+                        itemDiv.textContent = comm.name;
+                        groupDiv.appendChild(itemDiv);
+                    });
+                    
+                    playerInventory.appendChild(groupDiv);
+                }
+            }
+            
+            // Update action buttons based on current tile
+            const currentTile = boardConfig[currentPlayer.position];
+            
+            // Hide all action buttons first
+            buyBtn.classList.add('hidden');
+            setupTradingPostBtn.classList.add('hidden');
+            payFineBtn.classList.add('hidden');
+            tradeBtn.classList.add('hidden');
+            
+            // Show appropriate buttons based on tile type
+            if (currentTile.type === 'commodity' && !currentPlayer.ownedProperties.includes(currentPlayer.position)) {
+                buyBtn.classList.remove('hidden');
+            }
+            
+            if (currentTile.type === 'merchant-quarters') {
+                tradeBtn.classList.remove('hidden');
+            }
+            
+            if (currentTile.type === 'detention') {
+                payFineBtn.classList.remove('hidden');
+            }
+            
+            // Only allow setting up a trading post if the player owns the property
+            if (currentTile.type === 'commodity' && currentPlayer.ownedProperties.includes(currentPlayer.position) && !currentPlayer.tradingPosts.includes(currentPlayer.position)) {
+                setupTradingPostBtn.classList.remove('hidden');
+            }
+        }
+        
+        function movePlayer(player, steps) {
+            const oldPosition = player.position;
+            player.position = (player.position + steps) % boardConfig.length;
+            
+            // Check if player passed start
+            if (player.position < oldPosition) {
+                player.tips += 200; // Give TIPs for completing a circuit
+                addLogEntry(`${player.name} completed a circuit and received 200 TIPs!`);
+            }
+            
+            // Update player token position on board
+            updatePlayerTokens();
+            
+            // Handle tile landing
+            const landedTile = boardConfig[player.position];
+            addLogEntry(`${player.name} landed on ${landedTile.name}`);
+            
+            // Handle special tiles
+            if (landedTile.type === 'testimonial') {
+                showTestimonial();
+            } else if (landedTile.type === 'factfile') {
+                showFactFile();
+            } else if (landedTile.type === 'fate-card') {
+                drawFateCard();
+            } else if (landedTile.type === 'checkpoint') {
+                handleCheckpoint();
+            } else if (landedTile.type === 'detention') {
+                addLogEntry(`${player.name} is in the Mongol Detention Camp!`);
+            }
+            
+            updatePlayerInfo();
+        }
+        
+        function showTestimonial() {
+            const testimonials = [
+                "\"The silks of China are unmatched in their brilliance. I have seen them dyed in every color imaginable, from the deepest blue of the night sky to the bright red of pomegranate seeds.\" - Persian merchant, 9th century",
+                "\"In the markets of Bukhara, I witnessed the sale of slaves from lands so distant that none could understand their tongue. The Mongol overseers kept strict records of each transaction.\" - Arab traveler, 12th century",
+                "\"The pepper markets of Kerala overflow with black gold. Merchants argue fiercely over prices, knowing that a single sack can fetch ten times its value in distant Constantinople.\" - Venetian trader, 14th century",
+                "\"I observed craftsmen in Samarkand setting lapis lazuli into gold with such precision that the joins were invisible to the eye. Their skill surpasses all others in the lands I have traveled.\" - Chinese diplomat, 10th century"
+            ];
+            
+            const randomTestimonial = testimonials[Math.floor(Math.random() * testimonials.length)];
+            
+            showModal(
+                "Historical Testimonial", 
+                `<div class="bg-amber-100 p-4 border-l-4 border-amber-500 italic">${randomTestimonial}</div>
+                <p class="mt-4">Answer this question correctly to earn bonus TIPs:</p>
+                <p class="font-bold mt-2">Which commodity is mentioned in this testimonial?</p>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input type="radio" name="quiz" id="option1" value="silk">
+                        <label for="option1" class="ml-2">Silk</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" name="quiz" id="option2" value="slaves">
+                        <label for="option2" class="ml-2">Slaves</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" name="quiz" id="option3" value="spices">
+                        <label for="option3" class="ml-2">Spices</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" name="quiz" id="option4" value="jewelry">
+                        <label for="option4" class="ml-2">Jewelry</label>
+                    </div>
+                </div>`,
+                "Submit Answer",
+                "Skip",
+                () => {
+                    const selectedOption = document.querySelector('input[name="quiz"]:checked');
+                    if (selectedOption) {
+                        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                        if (
+                            (randomTestimonial.includes("silks") && selectedOption.value === "silk") ||
+                            (randomTestimonial.includes("slaves") && selectedOption.value === "slaves") ||
+                            (randomTestimonial.includes("pepper") && selectedOption.value === "spices") ||
+                            (randomTestimonial.includes("lapis lazuli") && selectedOption.value === "jewelry")
+                        ) {
+                            currentPlayer.tips += 50;
+                            addLogEntry(`${currentPlayer.name} answered correctly and earned 50 TIPs!`);
+                        } else {
+                            addLogEntry(`${currentPlayer.name} answered incorrectly. No bonus.`);
+                        }
+                        updatePlayerInfo();
+                        closeModal();
+                    }
+                },
+                closeModal
+            );
+        }
+        
+        function showFactFile() {
+            const factFiles = [
+                {
+                    title: "Silk Production",
+                    content: "Silk production was a closely guarded secret in China for over 2,000 years. The process involves harvesting silk from the cocoons of silkworms, which are the larvae of the silk moth Bombyx mori. According to legend, silk was discovered by Chinese empress Leizu around 2700 BCE when a cocoon fell into her tea."
+                },
+                {
+                    title: "Spice Trade Routes",
+                    content: "Pepper from India was so valuable in medieval Europe that it was often used as currency. Merchants would travel dangerous sea routes around the Arabian Peninsula to bring spices to Mediterranean ports. Venice and Genoa became wealthy largely due to their control of the spice trade."
+                },
+                {
+                    title: "Jewelry Craftsmanship",
+                    content: "Samarkand became a center for jewelry production due to its access to precious metals through trade and its proximity to gem sources like the lapis lazuli mines of Badakhshan. Jewelers developed distinctive techniques that blended Persian, Chinese, and Indian aesthetics."
+                },
+                {
+                    title: "Slave Trade Practices",
+                    content: "The slave trade was a significant component of Silk Road commerce. Captives from wars, raids, and debt bondage were sold in markets like Bukhara. Slaves with specialized skills could fetch higher prices, and many ended up serving in courts or elite households across Asia."
+                }
+            ];
+            
+            const randomFact = factFiles[Math.floor(Math.random() * factFiles.length)];
+            
+            showModal(
+                `Fact File: ${randomFact.title}`,
+                `<div class="bg-blue-50 p-4 border border-blue-200">
+                    <p>${randomFact.content}</p>
+                </div>
+                <p class="mt-4">Would you like to purchase a Fact File privilege for 100 TIPs?</p>
+                <p class="text-sm text-gray-600">This will boost your earnings when you land on related commodity tiles.</p>`,
+                "Purchase",
+                "Decline",
+                () => {
+                    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                    if (currentPlayer.tips >= 100) {
+                        currentPlayer.tips -= 100;
+                        if (!currentPlayer.factFiles) {
+                            currentPlayer.factFiles = [];
+                        }
+                        currentPlayer.factFiles.push(randomFact.title.toLowerCase());
+                        addLogEntry(`${currentPlayer.name} purchased the ${randomFact.title} Fact File privilege.`);
+                        updatePlayerInfo();
+                    } else {
+                        addLogEntry(`${currentPlayer.name} doesn't have enough TIPs to purchase the Fact File privilege.`);
+                    }
+                    closeModal();
+                },
+                closeModal
+            );
+        }
+        
+        function drawFateCard() {
+            const fateCards = [
+                {
+                    title: "Bandit Attack!",
+                    content: "Your caravan is ambushed by bandits in a mountain pass.",
+                    effect: "Lose 100 TIPs",
+                    action: (player) => {
+                        player.tips = Math.max(0, player.tips - 100);
+                        addLogEntry(`${player.name} lost 100 TIPs due to a bandit attack!`);
+                    }
+                },
+                {
+                    title: "Favorable Weather",
+                    content: "Unusually good weather allows your caravan to travel faster than expected.",
+                    effect: "Move ahead 3 spaces",
+                    action: (player) => {
+                        movePlayer(player, 3);
+                        addLogEntry(`${player.name} moved ahead 3 spaces due to favorable weather!`);
+                    }
+                },
+                {
+                    title: "Cultural Exchange",
+                    content: "You share stories and knowledge with local traders, establishing goodwill.",
+                    effect: "Receive 50 TIPs",
+                    action: (player) => {
+                        player.tips += 50;
+                        addLogEntry(`${player.name} received 50 TIPs from cultural exchange!`);
+                    }
+                },
+                {
+                    title: "Royal Patronage",
+                    content: "A local ruler takes interest in your exotic goods and offers patronage.",
+                    effect: "Receive 150 TIPs",
+                    action: (player) => {
+                        player.tips += 150;
+                        addLogEntry(`${player.name} received 150 TIPs from royal patronage!`);
+                    }
+                },
+                {
+                    title: "Harsh Desert Crossing",
+                    content: "Your caravan struggles through a difficult desert crossing, losing time and resources.",
+                    effect: "Lose one turn",
+                    action: (player) => {
+                        player.skipTurn = true;
+                        addLogEntry(`${player.name} will lose the next turn due to a harsh desert crossing!`);
+                    }
+                }
+            ];
+            
+            const drawnCard = fateCards[Math.floor(Math.random() * fateCards.length)];
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            showModal(
+                "Caravan Fate Card",
+                `<div class="bg-purple-50 p-4 border border-purple-200">
+                    <h3 class="font-bold text-purple-800">${drawnCard.title}</h3>
+                    <p class="my-2">${drawnCard.content}</p>
+                    <p class="font-bold text-purple-800">${drawnCard.effect}</p>
+                </div>`,
+                "Accept Fate",
+                null,
+                () => {
+                    drawnCard.action(currentPlayer);
+                    updatePlayerInfo();
+                    closeModal();
+                }
+            );
+        }
+        
+        function handleCheckpoint() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            showModal(
+                "Mongol Border Checkpoint",
+                `<div class="bg-red-50 p-4 border border-red-200">
+                    <p>Your caravan has reached a Mongol checkpoint. You must pass inspection or be detained!</p>
+                    <p class="mt-2">Roll a dice to determine your fate:</p>
+                    <p class="text-sm">1-3: Failed inspection - Go to detention camp</p>
+                    <p class="text-sm">4-6: Passed inspection - Pay 50 TIPs tax and continue</p>
+                </div>`,
+                "Roll for Inspection",
+                null,
+                () => {
+                    const roll = Math.floor(Math.random() * 6) + 1;
+                    
+                    if (roll <= 3) {
+                        // Failed inspection
+                        currentPlayer.position = 9; // Move to detention camp
+                        addLogEntry(`${currentPlayer.name} failed inspection (rolled ${roll}) and was sent to the Mongol Detention Camp!`);
+                        updatePlayerTokens();
+                    } else {
+                        // Passed inspection
+                        currentPlayer.tips = Math.max(0, currentPlayer.tips - 50);
+                        addLogEntry(`${currentPlayer.name} passed inspection (rolled ${roll}) and paid 50 TIPs in taxes.`);
+                    }
+                    
+                    updatePlayerInfo();
+                    closeModal();
+                }
+            );
+        }
+        
+        function updatePlayerTokens() {
+            // Remove all existing tokens
+            document.querySelectorAll('.player-token').forEach(token => token.remove());
+            
+            // Add tokens at their current positions
+            gameState.players.forEach((player, index) => {
+                const position = player.position;
+                const tileElement = document.querySelector(`[data-position="${position}"]`);
+                
+                if (tileElement) {
+                    const token = document.createElement('div');
+                    token.className = 'player-token';
+                    token.style.backgroundColor = player.color;
+                    
+                    // Calculate position within the tile (distribute players if multiple on same tile)
+                    const playersOnTile = gameState.players.filter(p => p.position === position);
+                    const playerIndexOnTile = playersOnTile.findIndex(p => p.id === player.id);
+                    const offset = 5 * (playerIndexOnTile - (playersOnTile.length - 1) / 2);
+                    
+                    // Position token based on where the tile is on the board
+                    if (position === 0 || position === 9 || position === 18 || position === 27) {
+                        // Corner tile - center it
+                        token.style.top = `calc(50% + ${offset}px)`;
+                        token.style.left = `calc(50% + ${offset}px)`;
+                    } else if (position > 0 && position < 9) {
+                        // Bottom row
+                        token.style.bottom = '5px';
+                        token.style.left = `calc(50% + ${offset}px)`;
+                    } else if (position > 9 && position < 18) {
+                        // Left column
+                        token.style.left = '5px';
+                        token.style.top = `calc(50% + ${offset}px)`;
+                    } else if (position > 18 && position < 27) {
+                        // Top row
+                        token.style.top = '5px';
+                        token.style.left = `calc(50% + ${offset}px)`;
+                    } else if (position > 27) {
+                        // Right column
+                        token.style.right = '5px';
+                        token.style.top = `calc(50% + ${offset}px)`;
+                    }
+                    
+                    tileElement.appendChild(token);
+                }
+            });
+        }
+        
+        // Set up the game board with the first document's layout
+        function initGameBoard() {
+            gameBoard.innerHTML = '';
+            
+            // Add the game center and diagonal elements
+            const boardCenter = document.createElement('div');
+            boardCenter.className = 'board-center';
+            boardCenter.textContent = 'Rolling Riches';
+            gameBoard.appendChild(boardCenter);
+            
+            const infoElement = document.createElement('div');
+            infoElement.className = 'diagonal-element info-element';
+            infoElement.innerHTML = 'ℹ️';
+            gameBoard.appendChild(infoElement);
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'diagonal-element question-element';
+            questionElement.innerHTML = '❓';
+            gameBoard.appendChild(questionElement);
+            
+            // Create corner tiles
+            
+            // Corner: Start (Chang'an)
+            const startCorner = document.createElement('div');
+            startCorner.className = 'corner-tile';
+            startCorner.style.gridColumn = '10 / span 2';
+            startCorner.style.gridRow = '10 / span 2';
+            startCorner.innerHTML = `
+                <div class="text-sm font-bold">CHANG'AN (XI'AN)</div>
+                <div class="start-arrow">↺</div>
+                <div class="text-xs">START</div>
+            `;
+            startCorner.dataset.position = '0';
+            gameBoard.appendChild(startCorner);
+            
+            // Corner: Detention Camp
+            const detentionCorner = document.createElement('div');
+            detentionCorner.className = 'corner-tile';
+            detentionCorner.style.gridColumn = '1 / span 2';
+            detentionCorner.style.gridRow = '10 / span 2';
+            detentionCorner.innerHTML = `
+                <div class="text-sm font-bold">MONGOL DETENTION CAMPS</div>
+                <div class="jail-icon">🔒</div>
+                <div class="text-xs">IN JAIL</div>
+            `;
+            detentionCorner.dataset.position = '9';
+            gameBoard.appendChild(detentionCorner);
+            
+            // Corner: Merchant Quarters
+            const merchantCorner = document.createElement('div');
+            merchantCorner.className = 'corner-tile';
+            merchantCorner.style.gridColumn = '1 / span 2';
+            merchantCorner.style.gridRow = '1 / span 2';
+            merchantCorner.innerHTML = `
+                <div class="text-sm font-bold">MERCHANT QUARTERS</div>
+                <div class="text-2xl">🏪</div>
+                <div class="text-xs">REST & TRADE</div>
+            `;
+            merchantCorner.dataset.position = '18';
+            gameBoard.appendChild(merchantCorner);
+            
+            // Corner: Mongol Checkpoints
+            const checkpointCorner = document.createElement('div');
+            checkpointCorner.className = 'corner-tile';
+            checkpointCorner.style.gridColumn = '10 / span 2';
+            checkpointCorner.style.gridRow = '1 / span 2';
+            checkpointCorner.innerHTML = `
+                <div class="text-sm font-bold">MONGOL CHECKPOINTS</div>
+                <div class="text-2xl">⚠️</div>
+                <div class="text-xs">INSPECTION</div>
+            `;
+            checkpointCorner.dataset.position = '27';
+            gameBoard.appendChild(checkpointCorner);
+            
+            // Bottom Row (Chang'an to Detention Camp)
+            for (let i = 1; i <= 8; i++) {
+                const tile = document.createElement('div');
+                const tileConfig = boardConfig[i];
+                
+                tile.className = `board-tile ${tileConfig.type === 'commodity' ? 'group-' + tileConfig.group : tileConfig.type} bottom-row`;
+                tile.style.gridColumn = 11 - i;
+                tile.style.gridRow = 11;
+                tile.dataset.position = i.toString();
+                
+                let tileContent = `<div class="tile-name">${tileConfig.name}</div>`;
+                
+                if (tileConfig.type === 'commodity') {
+                    tileContent += `<div class="price-tag">${tileConfig.price} TIPs</div>`;
+                } else if (tileConfig.icon) {
+                    tileContent += `<div class="card-icon">${tileConfig.icon}</div>`;
+                }
+                
+                tile.innerHTML = tileContent;
+                gameBoard.appendChild(tile);
+            }
+            
+            // Left Column (Detention Camp to Merchant Quarters)
+            for (let i = 10; i <= 17; i++) {
+                const tile = document.createElement('div');
+                const tileConfig = boardConfig[i];
+                
+                tile.className = `board-tile ${tileConfig.type === 'commodity' ? 'group-' + tileConfig.group : tileConfig.type} left-column`;
+                tile.style.gridColumn = 1;
+                tile.style.gridRow = 20 - i;
+                tile.dataset.position = i.toString();
+                
+                let tileContent = `<div class="tile-name">${tileConfig.name}</div>`;
+                
+                if (tileConfig.type === 'commodity') {
+                    tileContent += `<div class="price-tag">${tileConfig.price} TIPs</div>`;
+                } else if (tileConfig.icon) {
+                    tileContent += `<div class="card-icon">${tileConfig.icon}</div>`;
+                }
+                
+                tile.innerHTML = tileContent;
+                gameBoard.appendChild(tile);
+            }
+            
+            // Top Row (Merchant Quarters to Mongol Checkpoints)
+            for (let i = 19; i <= 26; i++) {
+                const tile = document.createElement('div');
+                const tileConfig = boardConfig[i];
+                
+                tile.className = `board-tile ${tileConfig.type === 'commodity' ? 'group-' + tileConfig.group : tileConfig.type} top-row`;
+                tile.style.gridColumn = i - 18;
+                tile.style.gridRow = 1;
+                tile.dataset.position = i.toString();
+                
+                let tileContent = `<div class="tile-name">${tileConfig.name}</div>`;
+                
+                if (tileConfig.type === 'commodity') {
+                    tileContent += `<div class="price-tag">${tileConfig.price} TIPs</div>`;
+                } else if (tileConfig.icon) {
+                    tileContent += `<div class="card-icon">${tileConfig.icon}</div>`;
+                }
+                
+                tile.innerHTML = tileContent;
+                gameBoard.appendChild(tile);
+            }
+            
+            // Right Column (Mongol Checkpoints to Chang'an)
+            for (let i = 28; i <= 35; i++) {
+                const tile = document.createElement('div');
+                const tileConfig = boardConfig[i];
+                
+                tile.className = `board-tile ${tileConfig.type === 'commodity' ? 'group-' + tileConfig.group : tileConfig.type} right-column`;
+                tile.style.gridColumn = 11;
+                tile.style.gridRow = i - 26;
+                tile.dataset.position = i.toString();
+                
+                let tileContent = `<div class="tile-name">${tileConfig.name}</div>`;
+                
+                if (tileConfig.type === 'commodity') {
+                    tileContent += `<div class="price-tag">${tileConfig.price} TIPs</div>`;
+                } else if (tileConfig.icon) {
+                    tileContent += `<div class="card-icon">${tileConfig.icon}</div>`;
+                }
+                
+                tile.innerHTML = tileContent;
+                gameBoard.appendChild(tile);
+            }
+        }
+        
+        // Set up the game
+        function initGame() {
+            // Generate board
+            initGameBoard();
+            
+            // Place player tokens
+            updatePlayerTokens();
+            
+            // Initialize the current player info
+            updatePlayerInfo();
+            
+            // Add initial log entry
+            addLogEntry(`Game started with ${gameState.players.length} players.`);
+        }
+        
+        // Entry screen handlers
+        addPlayerBtn.addEventListener('click', () => {
+            const playerCount = document.querySelectorAll('.player-input').length;
+            
+            if (playerCount < gameConfig.maxPlayers) {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player-input flex flex-col space-y-2 p-3 border border-amber-200 rounded-md mb-3';
+                playerDiv.innerHTML = `
+                    <label class="text-amber-800">Player ${playerCount + 1} Name:</label>
+                    <input type="text" name="player-name" required class="border border-amber-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <div class="flex items-center space-x-2 mt-2">
+                        <label class="text-amber-800 flex-1">Token Color:</label>
+                        <div class="flex space-x-2">
+                            <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-red-500" data-color="#EF4444"></div>
+                            <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-blue-500" data-color="#3B82F6"></div>
+                            <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-green-500" data-color="#10B981"></div>
+                            <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-yellow-500" data-color="#F59E0B"></div>
+                            <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-purple-500" data-color="#8B5CF6"></div>
+                            <div class="token-option cursor-pointer w-6 h-6 rounded-full bg-pink-500" data-color="#EC4899"></div>
+                            <input type="hidden" name="player-color" value="">
+                        </div>
+                    </div>
+                `;
+                
+                playersContainer.appendChild(playerDiv);
+                
+                // Add event listeners to the new token options
+                playerDiv.querySelectorAll('.token-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Remove selected class from all options in this set
+                        this.parentElement.querySelectorAll('.token-option').forEach(opt => {
+                            opt.classList.remove('ring-4', 'ring-black');
+                        });
+                        
+                        // Add selected class to clicked option
+                        this.classList.add('ring-4', 'ring-black');
+                        
+                        // Store the selected color in the hidden input
+                        this.parentElement.querySelector('input[name="player-color"]').value = this.dataset.color;
+                    });
+                });
+                
+                // Select first color by default
+                playerDiv.querySelector('.token-option').click();
+                
+                // Show remove button if there are at least two players
+                if (playerCount + 1 >= gameConfig.minPlayers) {
+                    removePlayerBtn.classList.remove('hidden');
+                }
+                
+                // Hide add button if max players reached
+                if (playerCount + 1 >= gameConfig.maxPlayers) {
+                    addPlayerBtn.classList.add('hidden');
+                }
+            }
+        });
+        
+        removePlayerBtn.addEventListener('click', () => {
+            const playerInputs = document.querySelectorAll('.player-input');
+            
+            if (playerInputs.length > gameConfig.minPlayers) {
+                // Remove the last player input
+                playerInputs[playerInputs.length - 1].remove();
+                
+                // Update button states
+                addPlayerBtn.classList.remove('hidden');
+                
+                if (playerInputs.length - 1 <= gameConfig.minPlayers) {
+                    removePlayerBtn.classList.add('hidden');
+                }
+            }
+        });
+        
+        // Attach token selection handlers to all player inputs
+        document.querySelectorAll('.token-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options in this set
+                this.parentElement.querySelectorAll('.token-option').forEach(opt => {
+                    opt.classList.remove('ring-4', 'ring-black');
+                });
+                
+                // Add selected class to clicked option
+                this.classList.add('ring-4', 'ring-black');
+                
+                // Store the selected color in the hidden input
+                this.parentElement.querySelector('input[name="player-color"]').value = this.dataset.color;
+            });
+        });
+        
+        // Select different colors by default for the initial players
+        document.querySelectorAll('.player-input').forEach((player, index) => {
+            // Select red for first player and blue for second player
+            player.querySelectorAll('.token-option')[index].click();
+        });
+        
+        // Start game
+        playerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get all player inputs
+            const playerInputs = document.querySelectorAll('.player-input');
+            const players = [];
+            
+            // Validate all inputs
+            let allValid = true;
+            const usedColors = new Set();
+            const usedNames = new Set();
+            
+            playerInputs.forEach(input => {
+                const nameInput = input.querySelector('input[name="player-name"]');
+                const colorInput = input.querySelector('input[name="player-color"]');
+                
+                if (!nameInput.value) {
+                    nameInput.classList.add('border-red-500');
+                    allValid = false;
+                } else {
+                    nameInput.classList.remove('border-red-500');
+                    
+                    // Check for duplicate names
+                    if (usedNames.has(nameInput.value)) {
+                        nameInput.classList.add('border-red-500');
+                        allValid = false;
+                    } else {
+                        usedNames.add(nameInput.value);
+                    }
+                }
+                
+                if (!colorInput.value) {
+                    input.querySelector('.token-option').classList.add('border-red-500');
+                    allValid = false;
+                } else {
+                    // Check for duplicate colors
+                    if (usedColors.has(colorInput.value)) {
+                        input.querySelectorAll('.token-option').forEach(opt => {
+                            if (opt.dataset.color === colorInput.value) {
+                                opt.classList.add('border-red-500');
+                            }
+                        });
+                        allValid = false;
+                    } else {
+                        usedColors.add(colorInput.value);
+                    }
+                }
+            });
+            
+            if (!allValid) {
+                return;
+            }
+            
+            // Create player objects
+            playerInputs.forEach((input, index) => {
+                const name = input.querySelector('input[name="player-name"]').value;
+                const color = input.querySelector('input[name="player-color"]').value;
+                
+                players.push({
+                    id: index + 1,
+                    name,
+                    color,
+                    tips: gameConfig.startingTips,
+                    position: gameConfig.startingPosition,
+                    commodities: [],
+                    ownedProperties: [],
+                    tradingPosts: [],
+                    factFiles: [],
+                    skipTurn: false
+                });
+            });
+            
+            // Set up game state
+            gameState.players = players;
+            gameState.currentPlayerIndex = 0;
+            gameState.gameStarted = true;
+            
+            // Switch from entry screen to game screen
+            entryScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            // Initialize the game board
+            initGame();
+        });
+        
+        // Game action handlers
+        rollDiceBtn.addEventListener('click', () => {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // Check if player should skip turn
+            if (currentPlayer.skipTurn) {
+                currentPlayer.skipTurn = false;
+                addLogEntry(`${currentPlayer.name} skipped a turn.`);
+                endTurnBtn.click();
+                return;
+            }
+            
+            // Roll the dice
+            const roll = Math.floor(Math.random() * 6) + 1;
+            diceEl.textContent = roll;
+            
+            addLogEntry(`${currentPlayer.name} rolled a ${roll}.`);
+            
+            // Move the player
+            movePlayer(currentPlayer, roll);
+            
+            // Disable roll button after rolling
+            rollDiceBtn.disabled = true;
+            rollDiceBtn.classList.add('opacity-50');
+        });
+        
+        buyBtn.addEventListener('click', () => {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            const currentTile = boardConfig[currentPlayer.position];
+            
+            if (currentPlayer.tips >= currentTile.price) {
+                // Purchase the commodity
+                currentPlayer.tips -= currentTile.price;
+                currentPlayer.ownedProperties.push(currentPlayer.position);
+                
+                // Add to player's commodities
+                currentPlayer.commodities.push({
+                    name: currentTile.name,
+                    group: currentTile.group,
+                    position: currentPlayer.position
+                });
+                
+                addLogEntry(`${currentPlayer.name} purchased ${currentTile.name} for ${currentTile.price} TIPs.`);
+                
+                // Check if player owns full group
+                const groupProperties = boardConfig
+                    .map((tile, index) => ({ ...tile, index }))
+                    .filter(tile => tile.type === 'commodity' && tile.group === currentTile.group);
+                
+                const ownedInGroup = groupProperties.filter(prop => 
+                    currentPlayer.ownedProperties.includes(prop.index)
+                );
+                
+                if (ownedInGroup.length === groupProperties.length) {
+                    addLogEntry(`${currentPlayer.name} now owns all ${currentTile.group} commodities!`);
+                    
+                    // Give bonus
+                    const bonus = groupProperties.length * 50;
+                    currentPlayer.tips += bonus;
+                    addLogEntry(`${currentPlayer.name} received a ${bonus} TIP bonus for collecting the full set.`);
+                }
+                
+                // Hide buy button after purchase
+                buyBtn.classList.add('hidden');
+                
+                // Show trading post button if not already set up
+                if (!currentPlayer.tradingPosts.includes(currentPlayer.position)) {
+                    setupTradingPostBtn.classList.remove('hidden');
+                }
+                
+                updatePlayerInfo();
+            } else {
+                addLogEntry(`${currentPlayer.name} doesn't have enough TIPs to purchase ${currentTile.name}.`);
+            }
+        });
+        
+        setupTradingPostBtn.addEventListener('click', () => {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            const tradingPostCost = 100;
+            
+            if (currentPlayer.tips >= tradingPostCost) {
+                currentPlayer.tips -= tradingPostCost;
+                currentPlayer.tradingPosts.push(currentPlayer.position);
+                
+                addLogEntry(`${currentPlayer.name} set up a trading post at ${boardConfig[currentPlayer.position].name} for ${tradingPostCost} TIPs.`);
+                
+                // Hide the button after setting up
+                setupTradingPostBtn.classList.add('hidden');
+                
+                updatePlayerInfo();
+            } else {
+                addLogEntry(`${currentPlayer.name} doesn't have enough TIPs to set up a trading post.`);
+            }
+        });
+        
+        payFineBtn.addEventListener('click', () => {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            const fine = 100;
+            
+            if (currentPlayer.tips >= fine) {
+                currentPlayer.tips -= fine;
+                addLogEntry(`${currentPlayer.name} paid ${fine} TIPs to be released from detention.`);
+                
+                // Move player to just visiting
+                currentPlayer.position = 0;
+                updatePlayerTokens();
+                updatePlayerInfo();
+                
+                // Hide pay fine button
+                payFineBtn.classList.add('hidden');
+            } else {
+                addLogEntry(`${currentPlayer.name} doesn't have enough TIPs to pay the fine.`);
+            }
+        });
+        
+        tradeBtn.addEventListener('click', () => {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // Simple trade options with the system
+            const tradeOptions = [
+                { give: "2 silk", get: "1 jewelry", valid: currentPlayer.commodities.filter(c => c.group === 'silk').length >= 2 },
+                { give: "2 spice", get: "1 silk", valid: currentPlayer.commodities.filter(c => c.group === 'spice').length >= 2 },
+                { give: "2 slaves", get: "1 jewelry", valid: currentPlayer.commodities.filter(c => c.group === 'slaves').length >= 2 },
+                { give: "50 TIPs", get: "1 spice", valid: currentPlayer.tips >= 50 }
+            ];
+            
+            // Filter to valid trades only
+            const validTrades = tradeOptions.filter(t => t.valid);
+            
+            if (validTrades.length === 0) {
+                showModal(
+                    "Trade at Merchant Quarters",
+                    `<p>You don't have enough resources for any available trades.</p>`,
+                    "Close",
+                    null,
+                    closeModal
+                );
+                return;
+            }
+            
+            // Build trade options HTML
+            let tradeOptionsHtml = `<p>Select a trade to make:</p><div class="space-y-2 mt-3">`;
+            
+            validTrades.forEach((trade, index) => {
+                tradeOptionsHtml += `
+                    <div class="flex items-center">
+                        <input type="radio" name="trade" id="trade${index}" value="${index}" ${index === 0 ? 'checked' : ''}>
+                        <label for="trade${index}" class="ml-2">Give: ${trade.give} | Get: ${trade.get}</label>
+                    </div>
+                `;
+            });
+            
+            tradeOptionsHtml += `</div>`;
+            
+            showModal(
+                "Trade at Merchant Quarters",
+                tradeOptionsHtml,
+                "Make Trade",
+                "Cancel",
+                () => {
+                    const selectedOption = document.querySelector('input[name="trade"]:checked');
+                    if (selectedOption) {
+                        const tradeIndex = parseInt(selectedOption.value);
+                        const selectedTrade = validTrades[tradeIndex];
+                        
+                        // Execute the trade
+                        if (selectedTrade.give.includes('TIPs')) {
+                            // Trading TIPs for commodity
+                            const tipAmount = parseInt(selectedTrade.give.split(' ')[0]);
+                            currentPlayer.tips -= tipAmount;
+                            
+                            // Add the commodity
+                            const commodityType = selectedTrade.get.split(' ')[1];
+                            currentPlayer.commodities.push({
+                                name: `Merchant Quarters ${commodityType}`,
+                                group: commodityType,
+                                position: -1 // Special marker for traded goods
+                            });
+                            
+                            addLogEntry(`${currentPlayer.name} traded ${tipAmount} TIPs for 1 ${commodityType}.`);
+                        } else {
+                            // Trading commodities
+                            const giveType = selectedTrade.give.split(' ')[1];
+                            const giveCount = parseInt(selectedTrade.give.split(' ')[0]);
+                            const getType = selectedTrade.get.split(' ')[1];
+                            
+                            // Remove commodities being traded away
+                            for (let i = 0; i < giveCount; i++) {
+                                const commodityIndex = currentPlayer.commodities.findIndex(c => c.group === giveType);
+                                if (commodityIndex !== -1) {
+                                    currentPlayer.commodities.splice(commodityIndex, 1);
+                                }
+                            }
+                            
+                            // Add the new commodity
+                            currentPlayer.commodities.push({
+                                name: `Traded ${getType}`,
+                                group: getType,
+                                position: -1 // Special marker for traded goods
+                            });
+                            
+                            addLogEntry(`${currentPlayer.name} traded ${giveCount} ${giveType} for 1 ${getType}.`);
+                        }
+                        
+                        updatePlayerInfo();
+                        closeModal();
+                    }
+                },
+                closeModal
+            );
+        });
+        
+        endTurnBtn.addEventListener('click', () => {
+            // Collect trading post income
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            if (currentPlayer.tradingPosts.length > 0) {
+                const income = currentPlayer.tradingPosts.length * 50;
+                currentPlayer.tips += income;
+                addLogEntry(`${currentPlayer.name} collected ${income} TIPs from trading posts.`);
+            }
+            
+            // Move to next player
+            gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+            
+            // Reset dice and buttons for next player
+            diceEl.textContent = '?';
+            rollDiceBtn.disabled = false;
+            rollDiceBtn.classList.remove('opacity-50');
+            
+            // Update player info for new current player
+            updatePlayerInfo();
+            
+            addLogEntry(`It's now ${gameState.players[gameState.currentPlayerIndex].name}'s turn.`);
+        });
+        
+        // End game button
+        document.getElementById('end-game').addEventListener('click', () => {
+            // Calculate final scores
+            const finalScores = gameState.players.map(player => {
+                // Base score is TIPs
+                let score = player.tips;
+                
+                // Add value of commodities (half their purchase price)
+                player.commodities.forEach(comm => {
+                    const tile = boardConfig.find(t => t.name === comm.name);
+                    if (tile && tile.price) {
+                        score += tile.price / 2;
+                    } else {
+                        // For traded commodities, use average values
+                        const avgValues = {
+                            'silk': 150,
+                            'spice': 250,
+                            'jewelry': 350,
+                            'slaves': 450
+                        };
+                        
+                        score += avgValues[comm.group] || 100;
+                    }
+                });
+                
+                // Add value of trading posts
+                score += player.tradingPosts.length * 150;
+                
+                return {
+                    name: player.name,
+                    color: player.color,
+                    score
+                };
+            });
+            
+            // Sort by score
+            finalScores.sort((a, b) => b.score - a.score);
+            
+            // Create results HTML
+            let resultsHtml = `
+                <h3 class="font-bold text-lg mb-3">Final Standings</h3>
+                <div class="space-y-3">
+            `;
+            
+            finalScores.forEach((player, index) => {
+                resultsHtml += `
+                    <div class="flex items-center p-2 ${index === 0 ? 'bg-amber-100 border border-amber-300 rounded' : ''}">
+                        <div class="w-6 h-6 rounded-full mr-3" style="background-color: ${player.color}"></div>
+                        <div class="flex-1">${index + 1}. ${player.name}</div>
+                        <div class="font-bold">${Math.round(player.score)} TIPs</div>
+                    </div>
+                `;
+            });
+            
+            resultsHtml += `</div>`;
+            
+            // Add winner announcement
+            resultsHtml += `
+                <div class="mt-6 text-center">
+                    <h3 class="font-bold text-xl">🏆 ${finalScores[0].name} is the Silk Road's Greatest Merchant! 🏆</h3>
+                </div>
+            `;
+            
+            showModal(
+                "Game Over",
+                resultsHtml,
+                "Play Again",
+                null,
+                () => {
+                    // Reset game
+                    closeModal();
+                    gameScreen.classList.add('hidden');
+                    entryScreen.classList.remove('hidden');
+                }
+            );
+        });
+        
+        // Game rules button
+        document.getElementById('game-rules').addEventListener('click', () => {
+            showModal(
+                "Rolling Riches: Game Rules",
+                `
+                <div class="space-y-4 text-sm">
+                    <p><strong>Objective:</strong> Accumulate the most Trade Influence Points (TIPs) by trading commodities along the Silk Road.</p>
+                    
+                    <h3 class="font-bold text-lg">Basic Gameplay:</h3>
+                    <ol class="list-decimal ml-5 space-y-1">
+                        <li>Players take turns rolling the dice and moving around the board.</li>
+                        <li>Land on a commodity tile to purchase goods (silk, spices, jewelry, slaves).</li>
+                        <li>Establish trading posts to earn passive income.</li>
+                        <li>Navigate events like Mongol checkpoints and fate cards.</li>
+                        <li>Collect complete sets of commodities for bonuses.</li>
+                    </ol>
+                    
+                    <h3 class="font-bold text-lg">Special Tiles:</h3>
+                    <ul class="list-disc ml-5 space-y-1">
+                        <li><strong>Testimonials:</strong> Historical accounts with trivia questions.</li>
+                        <li><strong>Fact Files:</strong> Historical information that can be purchased for benefits.</li>
+                        <li><strong>Caravan Fate Cards:</strong> Random events that can help or hinder your journey.</li>
+                        <li><strong>Mongol Checkpoints:</strong> Pass inspection or be detained.</li>
+                        <li><strong>Merchant Quarters:</strong> Trade commodities for better ones.</li>
+                    </ul>
+                    
+                    <h3 class="font-bold text-lg">Winning:</h3>
+                    <p>The player with the most wealth (TIPs + commodity values + trading post values) at the end of the game wins!</p>
+                </div>
+                `,
+                "Close",
+                null,
+                closeModal
+            );
+        });
+        
+        // Initialize event handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select initial token colors
+            document.querySelectorAll('.player-input').forEach((player, index) => {
+                const colorOptions = player.querySelectorAll('.token-option');
+                if (colorOptions[index]) {
+                    colorOptions[index].click();
+                } else {
+                    colorOptions[0].click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
